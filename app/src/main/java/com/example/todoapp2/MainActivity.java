@@ -12,10 +12,10 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements
-        RecyclerViewAdapter.RecyclerClickListener,
-        OngoingFragment.EditDialogListener, ScheduledFragment.EditDialogListener,
-        CompletedFragment.EditDialogListener {
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.RecyclerClickListener,
+        OngoingFragment.EditDialogListener,
+        ScheduledFragment.EditDialogListener,
+        CompletedFragment.EditDialogListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void openDialog(){
-        ExampleDialog exampleDialog = new ExampleDialog();
+        ExampleDialog exampleDialog = new ExampleDialog(null,this);
         exampleDialog.show(getSupportFragmentManager(), "example dialog");
     }
 

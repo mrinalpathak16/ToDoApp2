@@ -2,8 +2,12 @@ package com.example.todoapp2;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -13,8 +17,12 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatDialogFragment;
+
+import com.example.todoapp2.data.TaskContract.TaskEntry;
+
 
 public class ExampleDialog extends AppCompatDialogFragment {
     private EditText label, desc;
@@ -24,6 +32,17 @@ public class ExampleDialog extends AppCompatDialogFragment {
     private TimePicker time;
     private DatePicker date;
 
+    public static final String LOG_TAG = ExampleDialog.class.getSimpleName();
+
+    private Uri mUri;
+    private Context mContext;
+
+    public ExampleDialog(Uri uri, Context context) {
+        super();
+        mUri = uri;
+        mContext = context;
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -31,13 +50,13 @@ public class ExampleDialog extends AppCompatDialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.layout_dialog, null);
 
-        String title = "Task Dialog";
-        //TODO: put Uri here if(item==null){
-        //    title = "Add Task";
-        //}
-        //else{
-        //    title = "Edit Task";
-        //}
+        String title;
+        if(mUri==null){
+            title="Add Task";
+        }
+        else{
+            title="Edit Task";
+        }
 
         builder.setView(view)
                 .setTitle(title)
@@ -50,21 +69,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        int type;
-                        if (normal.isChecked()) {
-                            type = 0;
-                        } else {
-                            type = 1;
-                        }
-                        String lab = label.getText().toString();
-                        String des;
-                        if (checkBox.isChecked()) {
-                            des = desc.getText().toString();
-                        } else {
-                            des = "";
-                        }
-                        String t = "" + time.getHour() + ":" + time.getMinute();
-                        String d = "" + date.getDayOfMonth() + "/" + (date.getMonth() + 1) + "/" + date.getYear();
+                        saveTask();
                     }
                 });
         normal = view.findViewById(R.id.normalTask);
@@ -111,4 +116,51 @@ public class ExampleDialog extends AppCompatDialogFragment {
         return builder.create();
     }
 
+    public void saveTask(){
+        int type;
+        if(normal.isChecked()){
+            type = 0;
+        }
+        else{
+            type = 1;
+        }
+        String taskLabel = label.getText().toString();
+        String taskDesc = desc.getText().toString();
+        long notifTime = ((long)date.getYear())*100000000 + (date.getMonth()+1)*1000000 +
+                date.getDayOfMonth()*10000 + time.getHour()*100 + time.getMinute();
+
+        Log.i(LOG_TAG,""+notifTime);
+
+        //TODO: Galti se press ho gaya wala condition
+
+        ContentValues values = new ContentValues();
+        values.put(TaskEntry.COLUMN_TASK_TYPE, type);
+        values.put(TaskEntry.COLUMN_TASK_LABEL,taskLabel);
+        values.put(TaskEntry.COLUMN_TASK_DESCRIPTION, taskDesc);
+        values.put(TaskEntry.COLUMN_NOTIFICATION_TIME, notifTime);
+
+        Uri savedUri;String message;
+        if(mUri == null){
+            savedUri = mContext.getContentResolver().insert(TaskEntry.CONTENT_URI, values);
+            if(savedUri!=null){
+                message = "Pet inserted";
+            }
+            else{
+                message = "error with saving pet";
+            }
+
+        }
+        else{
+            int i = mContext.getContentResolver().update(mUri, values, null, null);
+            if(i!=-1){
+                message = "Pet updated";
+            }
+            else{
+                message = "error with updating pet";
+            }
+        }
+        Toast.makeText(mContext, message,Toast.LENGTH_SHORT).show();
+
+    }
 }
+
