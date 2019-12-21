@@ -109,12 +109,6 @@ public class ExampleDialog extends AppCompatDialogFragment {
         date = view.findViewById(R.id.date);
         date.setMinDate(System.currentTimeMillis());
 
-        normal.setChecked(true);
-        label.setText("Label 1");
-        checkBox.setChecked(true);
-        desc.setText("This is the description of Task 1");
-        desc.setVisibility(View.VISIBLE);
-
         if(mUri!=null){
             int taskT = mCursor.getInt(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_TYPE));
             if(taskT==0)
@@ -122,7 +116,16 @@ public class ExampleDialog extends AppCompatDialogFragment {
             else
                 priority.setChecked(true);
             label.setText(mCursor.getString(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_LABEL)));
-            desc.setText(mCursor.getString(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_DESCRIPTION)));
+            String taskD = mCursor.getString(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_DESCRIPTION));
+            if(taskD.equals("")){
+                checkBox.setChecked(false);
+                desc.setVisibility(View.GONE);
+            }
+            else {
+                checkBox.setChecked(true);
+                desc.setVisibility(View.VISIBLE);
+            }
+            desc.setText(taskD);
         }
 
         return builder.create();

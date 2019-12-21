@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
         CompletedFragment.EditDialogListener {
     private long itemId;
 
+    //TODO: Time display karne ki vyavastha karo.
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
