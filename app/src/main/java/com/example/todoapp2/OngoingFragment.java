@@ -50,15 +50,18 @@ public class OngoingFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.editMenu:
-                // do your stuff
-                listener.openDialog();
-                break;
-            case R.id.deleteMenu:
-                break;
+        if(getUserVisibleHint()) {
+            switch (item.getItemId()) {
+                case R.id.editMenu:
+                    // do your stuff
+                    listener.openDialog();
+                    break;
+                case R.id.deleteMenu:
+                    break;
+            }
+            return true;
         }
-        return super.onContextItemSelected(item);
+        return false;
     }
 
     @NonNull
