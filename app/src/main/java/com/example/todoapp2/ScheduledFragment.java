@@ -1,6 +1,7 @@
 package com.example.todoapp2;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ public class ScheduledFragment extends Fragment implements LoaderManager.LoaderC
     private EditDialogListener listener;
     private MyListCursorAdapter mAdapter;
     private static final int TASK_LOADER = 0;
+    public Cursor mCursor;
 
     @Nullable
     @Override
@@ -31,7 +33,7 @@ public class ScheduledFragment extends Fragment implements LoaderManager.LoaderC
 
         mRecyclerView = rootView.findViewById(R.id.rv);
 
-        mAdapter = new MyListCursorAdapter(getContext(),null);
+        mAdapter = new MyListCursorAdapter(getContext(),null,102);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -50,13 +52,17 @@ public class ScheduledFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if(getUserVisibleHint()) {
+        mCursor = mAdapter.getCursor();
+        Uri uri = Uri.withAppendedPath(TaskEntry.CONTENT_URI,
+                String.valueOf(mAdapter.getItemId(mCursor.getPosition())));
+        if(getUserVisibleHint()&&item.getGroupId()==102) {
             switch (item.getItemId()) {
                 case R.id.editMenu:
                     // do your stuff
-                    listener.openDialog();
+                    listener.openDialog(uri, mCursor);
                     break;
                 case R.id.deleteMenu:
+                    getContext().getContentResolver().delete(uri, null, null);
                     break;
             }
             return true;
@@ -96,7 +102,7 @@ public class ScheduledFragment extends Fragment implements LoaderManager.LoaderC
 
 
     public interface EditDialogListener{
-        void openDialog();
+        void openDialog(Uri uri, Cursor cursor);
     }
 
 }

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,11 +37,12 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
     private Uri mUri;
     private Context mContext;
+    private Cursor mCursor;
 
-    public ExampleDialog(Uri uri, Context context) {
-        super();
+    public void setValues(Context context, Uri uri, Cursor cursor){
+        mContext =context;
         mUri = uri;
-        mContext = context;
+        mCursor = cursor;
     }
 
     @Override
@@ -112,6 +114,16 @@ public class ExampleDialog extends AppCompatDialogFragment {
         checkBox.setChecked(true);
         desc.setText("This is the description of Task 1");
         desc.setVisibility(View.VISIBLE);
+
+        if(mUri!=null){
+            int taskT = mCursor.getInt(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_TYPE));
+            if(taskT==0)
+                normal.setChecked(true);
+            else
+                priority.setChecked(true);
+            label.setText(mCursor.getString(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_LABEL)));
+            desc.setText(mCursor.getString(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_DESCRIPTION)));
+        }
 
         return builder.create();
     }

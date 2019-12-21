@@ -36,7 +36,7 @@ public class DetailsDialog extends AppCompatDialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         OngoingFragment.EditDialogListener listener =
                                 (OngoingFragment.EditDialogListener)mContext;
-                        listener.openDialog();
+                        listener.openDialog(mUri, mCursor);
                     }
                 })
                 .setNeutralButton("cancel", new DialogInterface.OnClickListener() {

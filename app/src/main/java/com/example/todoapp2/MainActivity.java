@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openDialog();
+                openDialog(null, null);
                 Toast.makeText(MainActivity.this, "FAB Clicked", Toast.LENGTH_SHORT).show();
             }
         });
@@ -51,8 +51,9 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
     }
 
     @Override
-    public void openDialog(){
-        ExampleDialog exampleDialog = new ExampleDialog(null,this);
+    public void openDialog(Uri uri, Cursor cursor){
+        ExampleDialog exampleDialog = new ExampleDialog();
+        exampleDialog.setValues(this, uri, cursor);
         exampleDialog.show(getSupportFragmentManager(), "example dialog");
     }
 

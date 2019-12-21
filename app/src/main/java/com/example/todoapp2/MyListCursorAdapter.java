@@ -24,10 +24,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MyListCursorAdapter extends CursorRecyclerViewAdapter<MyListCursorAdapter.ViewHolder> {
     private Context mContext;
     private RecyclerClickListener listener;
+    private int menuGroupId;
 
-    public MyListCursorAdapter(Context context, Cursor cursor){
+    public MyListCursorAdapter(Context context, Cursor cursor, int groupId){
         super(context,cursor);
         mContext = context;
+        menuGroupId = groupId;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder
@@ -48,8 +50,8 @@ public class MyListCursorAdapter extends CursorRecyclerViewAdapter<MyListCursorA
         }
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(Menu.NONE, R.id.editMenu, Menu.NONE, "Edit Task");
-            menu.add(Menu.NONE, R.id.deleteMenu, Menu.NONE, "Delete Task");
+            menu.add(menuGroupId, R.id.editMenu, Menu.NONE, "Edit Task");
+            menu.add(menuGroupId, R.id.deleteMenu, Menu.NONE, "Delete Task");
             menu.setHeaderTitle("Select The Action");
         }
     }
@@ -90,6 +92,7 @@ public class MyListCursorAdapter extends CursorRecyclerViewAdapter<MyListCursorA
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                cursor.moveToPosition(pos);
                 return false;
             }
         });
