@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +14,13 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatDialogFragment;
 
+import com.example.todoapp2.data.TaskContract.TaskEntry;
+
 public class DetailsDialog extends AppCompatDialogFragment {
     private TextView typeText, labelText, descText, timeText, dateText;
     private Context mContext;
+    private Cursor mCursor;
+    private Uri mUri;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -42,18 +48,25 @@ public class DetailsDialog extends AppCompatDialogFragment {
                 .setPositiveButton("delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        mContext.getContentResolver().delete(mUri,null,null);
                     }
                 });
 
         typeText = view.findViewById(R.id.typeText);
-        typeText.setText("Normal Task");
+        String typeT;
+        if(mCursor.getInt(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_TYPE))==0){
+            typeT = "Normal Task";
+        }
+        else {
+            typeT = "Priority Task";
+        }
+        typeText.setText(typeT);
 
         labelText = view.findViewById(R.id.labelText);
-        labelText.setText("Label 1");
+        labelText.setText(mCursor.getString(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_LABEL)));
 
         descText = view.findViewById(R.id.descText);
-        String d = "This is the description of Task 1";
+        String d = mCursor.getString(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_DESCRIPTION));
         if(d.equals("")){
             LinearLayout descRoot = view.findViewById(R.id.descRoot);
             descRoot.setVisibility(View.GONE);
@@ -71,7 +84,9 @@ public class DetailsDialog extends AppCompatDialogFragment {
         return builder.create();
     }
 
-    public void setVal(Context context){
+    public void setVal(Context context, Cursor cursor, Uri uri){
+        this.mUri = uri;
         this.mContext = context;
+        this.mCursor = cursor;
     }
 }
