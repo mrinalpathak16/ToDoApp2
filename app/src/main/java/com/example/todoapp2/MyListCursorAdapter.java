@@ -65,10 +65,11 @@ public class MyListCursorAdapter extends CursorRecyclerViewAdapter<MyListCursorA
     @Override
     public void onBindViewHolder(ViewHolder holder, final Cursor cursor, final int pos) {
         listener = (RecyclerClickListener)mContext;
-        holder.date.setText("27/11/2019");
+        TimeDateFormat obj = new TimeDateFormat(cursor.getLong(cursor.getColumnIndexOrThrow(TaskEntry.COLUMN_NOTIFICATION_TIME)));
+        holder.date.setText(obj.getDayOfMonth()+"/"+obj.getMonth()+"/"+obj.getYear());
         holder.label.setText(cursor.getString(cursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_LABEL)));
         holder.desc.setText(cursor.getString(cursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_DESCRIPTION)));
-        holder.time.setText("22:12");
+        holder.time.setText(obj.getHour()+":"+obj.getMinute());
         int type = cursor.getInt(cursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_TYPE));
         if(type==0){
             holder.image.setImageResource(R.drawable.ic_launcher_background);

@@ -75,11 +75,15 @@ public class DetailsDialog extends AppCompatDialogFragment {
             descText.setText(d);
         }
 
+        TimeDateFormat obj = new TimeDateFormat(mCursor.getLong(mCursor.getColumnIndexOrThrow(
+                TaskEntry.COLUMN_NOTIFICATION_TIME
+        )));
+
         timeText = view.findViewById(R.id.timeText);
-        timeText.setText("22:12");
+        timeText.setText(obj.getHour()+":"+obj.getMinute());
 
         dateText = view.findViewById(R.id.dateText);
-        dateText.setText("27/11/2019");
+        dateText.setText(obj.getDayOfMonth()+"/"+obj.getMonth()+"/"+obj.getYear());
 
         return builder.create();
     }
