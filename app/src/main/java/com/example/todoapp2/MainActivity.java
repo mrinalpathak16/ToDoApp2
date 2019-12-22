@@ -8,9 +8,13 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -18,6 +22,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import com.example.todoapp2.data.TaskContract.TaskEntry;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
@@ -25,7 +31,8 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
         OngoingFragment.EditDialogListener,
         ScheduledFragment.EditDialogListener,
         CompletedFragment.EditDialogListener {
-    private long itemId;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mCurrentUser;
 
     //TODO: Time display karne ki vyavastha karo.
 
@@ -33,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mAuth = FirebaseAuth.getInstance();
 
         ViewPager viewPager = findViewById(R.id.viewpager);
         SimpleFragmentPagerAdapter adapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager());
@@ -50,6 +59,37 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
             }
         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mCurrentUser = mAuth.getCurrentUser();
+        if(mCurrentUser==null){
+            Log.i("Login", "User not signed in");
+            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_logout, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                mAuth.signOut();
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
