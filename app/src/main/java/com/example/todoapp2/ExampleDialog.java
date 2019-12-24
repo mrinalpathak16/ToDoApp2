@@ -126,6 +126,16 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 desc.setVisibility(View.VISIBLE);
             }
             desc.setText(taskD);
+
+            TimeDateFormat obj = new TimeDateFormat(mCursor.getLong(mCursor.getColumnIndexOrThrow(
+                    TaskEntry.COLUMN_NOTIFICATION_TIME
+            )));
+
+            time.setMinute(Integer.parseInt(obj.getMinute()));
+            time.setHour(Integer.parseInt(obj.getHour()));
+
+            date.updateDate(Integer.parseInt(obj.getYear()),(Integer.parseInt(obj.getMonth())-1),
+                    Integer.parseInt(obj.getDayOfMonth()));
         }
 
         return builder.create();
