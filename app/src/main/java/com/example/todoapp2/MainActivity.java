@@ -3,11 +3,17 @@ package com.example.todoapp2;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -30,7 +36,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements MyListCursorAdapter.RecyclerClickListener,
         OngoingFragment.EditDialogListener,
         ScheduledFragment.EditDialogListener,
-        CompletedFragment.EditDialogListener {
+        CompletedFragment.EditDialogListener{
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
 
@@ -105,7 +111,4 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
         detailsDialog.setVal(this, cursor, uri);
         detailsDialog.show(getSupportFragmentManager(), "details dialog");
     }
-
-
-
 }

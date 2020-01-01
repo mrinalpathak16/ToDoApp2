@@ -1,10 +1,14 @@
 package com.example.todoapp2;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,8 +25,12 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.example.todoapp2.data.TaskContract.TaskEntry;
+
+import java.util.Calendar;
 
 
 public class ExampleDialog extends AppCompatDialogFragment {
@@ -165,10 +173,18 @@ public class ExampleDialog extends AppCompatDialogFragment {
         values.put(TaskEntry.COLUMN_NOTIFICATION_TIME, notifTime);
 
         Uri savedUri;String message;
+
+        Calendar c = Calendar.getInstance();
+        c.set(date.getYear(), date.getMonth(), date.getDayOfMonth(),
+                time.getHour(), time.getMinute(), 0);
+        long time = c.getTimeInMillis();
+
         if(mUri == null){
             savedUri = mContext.getContentResolver().insert(TaskEntry.CONTENT_URI, values);
             if(savedUri!=null){
                 message = "Pet inserted";
+                setAlarm(time);
+                Log.i("ExampleDialog", "alarm set");
             }
             else{
                 message = "error with saving pet";
@@ -185,6 +201,35 @@ public class ExampleDialog extends AppCompatDialogFragment {
             }
         }
         Toast.makeText(mContext, message,Toast.LENGTH_SHORT).show();
+
+    }
+
+
+    public void setAlarm(long t){
+
+        Intent intent = new Intent(mContext, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, "channelId")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Ooooo yeah")
+                .setContentText("this is the content text")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        Notification notification = builder.build();
+
+        Log.i("ExampleDialog", "built!"+t);
+
+        Intent notificationIntent = new Intent(mContext, MyNotificationPublisher.class);
+        notificationIntent.putExtra("notificationId", 0);
+        notificationIntent.putExtra("notification", notification);
+        PendingIntent pI = PendingIntent.getBroadcast(mContext, 0, notificationIntent,
+                0);
+
+        AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP,t, pI);
 
     }
 }
