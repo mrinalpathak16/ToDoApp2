@@ -29,6 +29,7 @@ public class TaskContract {
         public static final String COLUMN_TASK_LABEL = "label";
         public static final String COLUMN_TASK_DESCRIPTION = "description";
         public static final String COLUMN_NOTIFICATION_TIME = "time";
+        public static final String COLUMN_USER_ID = "user";
 
         public static final int NORMAL_TASK = 0;
         public static final int PRIORITY_TASK = 1;

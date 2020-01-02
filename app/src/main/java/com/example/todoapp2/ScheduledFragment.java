@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todoapp2.data.TaskContract.TaskEntry;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ScheduledFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     RecyclerView mRecyclerView;
@@ -25,11 +27,16 @@ public class ScheduledFragment extends Fragment implements LoaderManager.LoaderC
     private MyListCursorAdapter mAdapter;
     private static final int TASK_LOADER = 0;
     public Cursor mCursor;
+    public FirebaseAuth mAuth;
+    public FirebaseUser mCurrentUser;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.tab_name, container, false);
+
+        mAuth = FirebaseAuth.getInstance();
+        mCurrentUser = mAuth.getCurrentUser();
 
         mRecyclerView = rootView.findViewById(R.id.rv);
 
@@ -63,6 +70,9 @@ public class ScheduledFragment extends Fragment implements LoaderManager.LoaderC
                     break;
                 case R.id.deleteMenu:
                     getContext().getContentResolver().delete(uri, null, null);
+                    int Id = Integer.parseInt(uri.getLastPathSegment());
+                    ExampleDialog dialog1 = new ExampleDialog();
+                    dialog1.cancelAlarm(Id, getContext());
                     break;
             }
             return true;
@@ -81,11 +91,14 @@ public class ScheduledFragment extends Fragment implements LoaderManager.LoaderC
                 TaskEntry.COLUMN_NOTIFICATION_TIME
         };
 
+        String selection = TaskEntry.COLUMN_USER_ID + " = ?";
+        String[] selectionArgs = {mCurrentUser.getUid()};
+
         return new CursorLoader(getContext(),
                 TaskEntry.CONTENT_URI,
                 projection,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null);
 
     }

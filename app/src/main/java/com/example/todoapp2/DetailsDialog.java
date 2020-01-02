@@ -49,6 +49,9 @@ public class DetailsDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mContext.getContentResolver().delete(mUri,null,null);
+                        int Id = Integer.parseInt(mUri.getLastPathSegment());
+                        ExampleDialog dialog1 = new ExampleDialog();
+                        dialog1.cancelAlarm(Id, mContext);
                     }
                 });
 

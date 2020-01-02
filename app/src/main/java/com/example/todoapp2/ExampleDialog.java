@@ -10,6 +10,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,11 +49,15 @@ public class ExampleDialog extends AppCompatDialogFragment {
     private Uri mUri;
     private Context mContext;
     private Cursor mCursor;
+    private String mUsername;
+    private String mUid;
 
-    public void setValues(Context context, Uri uri, Cursor cursor){
+    public void setValues(Context context, Uri uri, Cursor cursor, String username, String uid){
         mContext =context;
         mUri = uri;
         mCursor = cursor;
+        mUsername = username;
+        mUid = uid;
     }
 
     @Override
@@ -171,6 +178,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
         values.put(TaskEntry.COLUMN_TASK_LABEL,taskLabel);
         values.put(TaskEntry.COLUMN_TASK_DESCRIPTION, taskDesc);
         values.put(TaskEntry.COLUMN_NOTIFICATION_TIME, notifTime);
+        values.put(TaskEntry.COLUMN_USER_ID, mUid);
 
         Uri savedUri;String message;
 
@@ -183,7 +191,8 @@ public class ExampleDialog extends AppCompatDialogFragment {
             savedUri = mContext.getContentResolver().insert(TaskEntry.CONTENT_URI, values);
             if(savedUri!=null){
                 message = "Pet inserted";
-                setAlarm(time);
+                int Id = Integer.parseInt(savedUri.getLastPathSegment());
+                setAlarm(time, Id);
                 Log.i("ExampleDialog", "alarm set");
             }
             else{
@@ -195,6 +204,9 @@ public class ExampleDialog extends AppCompatDialogFragment {
             int i = mContext.getContentResolver().update(mUri, values, null, null);
             if(i!=-1){
                 message = "Pet updated";
+                int Id = Integer.parseInt(mUri.getLastPathSegment());
+                cancelAlarm(Id, mContext);
+                setAlarm(time,Id);
             }
             else{
                 message = "error with updating pet";
@@ -205,17 +217,23 @@ public class ExampleDialog extends AppCompatDialogFragment {
     }
 
 
-    public void setAlarm(long t){
+    public void setAlarm(long t, int Id){
 
         Intent intent = new Intent(mContext, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, "channelId")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Ooooo yeah")
-                .setContentText("this is the content text")
+                .setSmallIcon(R.drawable.notif_icon)
+                .setContentTitle(label.getText().toString())
+                .setContentText(mUsername + " has a pending task!")
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                        R.drawable.ic_launcher_background))
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(desc.getText().toString()))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setAutoCancel(true);
 
         Notification notification = builder.build();
@@ -223,14 +241,29 @@ public class ExampleDialog extends AppCompatDialogFragment {
         Log.i("ExampleDialog", "built!"+t);
 
         Intent notificationIntent = new Intent(mContext, MyNotificationPublisher.class);
-        notificationIntent.putExtra("notificationId", 0);
+        notificationIntent.putExtra("notificationId", Id);
         notificationIntent.putExtra("notification", notification);
-        PendingIntent pI = PendingIntent.getBroadcast(mContext, 0, notificationIntent,
+        PendingIntent pI = PendingIntent.getBroadcast(
+                mContext,
+                Id,
+                notificationIntent,
                 0);
 
         AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP,t, pI);
 
+    }
+
+    public void cancelAlarm(int Id, Context context){
+        Intent notificationIntent = new Intent(context, MyNotificationPublisher.class);
+        PendingIntent pI = PendingIntent.getBroadcast(
+                context,
+                Id,
+                notificationIntent,
+                0);
+
+        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pI);
     }
 }
 
