@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,15 +42,17 @@ public class OngoingFragment extends Fragment implements LoaderManager.LoaderCal
         mRecyclerView = rootView.findViewById(R.id.rv);
 
         mAdapter = new MyListCursorAdapter(getContext(),null,101);
+        mAdapter.setHasStableIds(true);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         listener = (EditDialogListener)getContext();
 
         getLoaderManager().initLoader(TASK_LOADER,null, this);
 
         return rootView;
     }
+
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -99,7 +102,7 @@ public class OngoingFragment extends Fragment implements LoaderManager.LoaderCal
                 projection,
                 selection,
                 null,
-                null);
+                TaskEntry.COLUMN_NOTIFICATION_TIME + " ASC");
 
     }
 

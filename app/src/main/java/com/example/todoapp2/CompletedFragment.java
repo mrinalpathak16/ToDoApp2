@@ -99,7 +99,7 @@ public class CompletedFragment extends Fragment implements LoaderManager.LoaderC
                 projection,
                 selection,
                 null,
-                null);
+                TaskEntry.COLUMN_NOTIFICATION_TIME + " ASC");
 
     }
 

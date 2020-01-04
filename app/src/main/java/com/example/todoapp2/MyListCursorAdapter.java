@@ -1,5 +1,6 @@
 package com.example.todoapp2;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todoapp2.data.CursorRecyclerViewAdapter;
 import com.example.todoapp2.data.TaskContract.TaskEntry;
+import com.google.android.material.button.MaterialButton;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -37,6 +40,7 @@ public class MyListCursorAdapter extends CursorRecyclerViewAdapter<MyListCursorA
         public CircleImageView image;
         public TextView time, label, desc, date;
         public RelativeLayout root;
+        public MaterialButton compButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -46,6 +50,7 @@ public class MyListCursorAdapter extends CursorRecyclerViewAdapter<MyListCursorA
             desc = itemView.findViewById(R.id.desc);
             date = itemView.findViewById(R.id.date);
             root = itemView.findViewById(R.id.root);
+            compButton = itemView.findViewById(R.id.completed_button);
             itemView.setOnCreateContextMenuListener(this);
         }
         @Override
@@ -76,6 +81,19 @@ public class MyListCursorAdapter extends CursorRecyclerViewAdapter<MyListCursorA
         }
         else {
             holder.image.setImageResource(R.drawable.priority);
+        }
+
+        if(menuGroupId==101){
+            holder.compButton.setVisibility(View.VISIBLE);
+            holder.compButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri uri = Uri.withAppendedPath(TaskEntry.CONTENT_URI, String.valueOf(getItemId(pos)));
+                    ContentValues values = new ContentValues();
+                    values.put(TaskEntry.COLUMN_TASK_STATUS, TaskEntry.COMPLETED_TASK);
+                    mContext.getContentResolver().update(uri, values, null, null);
+                }
+            });
         }
 
         holder.root.setOnClickListener(new View.OnClickListener() {
