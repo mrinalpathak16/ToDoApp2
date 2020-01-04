@@ -91,14 +91,14 @@ public class ScheduledFragment extends Fragment implements LoaderManager.LoaderC
                 TaskEntry.COLUMN_NOTIFICATION_TIME
         };
 
-        String selection = TaskEntry.COLUMN_USER_ID + " = ?";
-        String[] selectionArgs = {mCurrentUser.getUid()};
+        String selection = TaskEntry.COLUMN_USER_ID + "=\'" + mCurrentUser.getUid() +
+                "\' AND " + TaskEntry.COLUMN_TASK_STATUS + "=\'" + TaskEntry.SCHEDULED_TASK + '\'';
 
         return new CursorLoader(getContext(),
                 TaskEntry.CONTENT_URI,
                 projection,
                 selection,
-                selectionArgs,
+                null,
                 null);
 
     }

@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -179,6 +181,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
         values.put(TaskEntry.COLUMN_TASK_DESCRIPTION, taskDesc);
         values.put(TaskEntry.COLUMN_NOTIFICATION_TIME, notifTime);
         values.put(TaskEntry.COLUMN_USER_ID, mUid);
+        values.put(TaskEntry.COLUMN_TASK_STATUS, TaskEntry.SCHEDULED_TASK);
 
         Uri savedUri;String message;
 
@@ -192,7 +195,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
             if(savedUri!=null){
                 message = "Pet inserted";
                 int Id = Integer.parseInt(savedUri.getLastPathSegment());
-                setAlarm(time, Id);
+                setAlarm(time, Id, type);
                 Log.i("ExampleDialog", "alarm set");
             }
             else{
@@ -206,7 +209,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 message = "Pet updated";
                 int Id = Integer.parseInt(mUri.getLastPathSegment());
                 cancelAlarm(Id, mContext);
-                setAlarm(time,Id);
+                setAlarm(time,Id, type);
             }
             else{
                 message = "error with updating pet";
@@ -217,17 +220,24 @@ public class ExampleDialog extends AppCompatDialogFragment {
     }
 
 
-    public void setAlarm(long t, int Id){
+    public void setAlarm(long t, int Id, int type){
 
         Intent intent = new Intent(mContext, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+
+        Bitmap icon;
+        if (type==0){
+            icon = BitmapFactory.decodeResource(getResources(), R.drawable.normal);
+        }
+        else {
+            icon = BitmapFactory.decodeResource(getResources(), R.drawable.priority);
+        }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, "channelId")
                 .setSmallIcon(R.drawable.notif_icon)
                 .setContentTitle(label.getText().toString())
                 .setContentText(mUsername + " has a pending task!")
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
-                        R.drawable.ic_launcher_background))
+                .setLargeIcon(icon)
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(desc.getText().toString()))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -242,6 +252,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
         Intent notificationIntent = new Intent(mContext, MyNotificationPublisher.class);
         notificationIntent.putExtra("notificationId", Id);
+        notificationIntent.setData(Uri.withAppendedPath(TaskEntry.CONTENT_URI,String.valueOf(Id)));
         notificationIntent.putExtra("notification", notification);
         PendingIntent pI = PendingIntent.getBroadcast(
                 mContext,

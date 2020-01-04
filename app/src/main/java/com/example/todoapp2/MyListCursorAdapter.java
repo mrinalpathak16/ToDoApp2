@@ -72,10 +72,10 @@ public class MyListCursorAdapter extends CursorRecyclerViewAdapter<MyListCursorA
         holder.time.setText(obj.getHour()+":"+obj.getMinute());
         int type = cursor.getInt(cursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_TYPE));
         if(type==0){
-            holder.image.setImageResource(R.drawable.ic_launcher_background);
+            holder.image.setImageResource(R.drawable.normal);
         }
         else {
-            holder.image.setImageResource(R.mipmap.ic_launcher);
+            holder.image.setImageResource(R.drawable.priority);
         }
 
         holder.root.setOnClickListener(new View.OnClickListener() {

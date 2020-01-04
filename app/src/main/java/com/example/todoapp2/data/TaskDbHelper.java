@@ -27,7 +27,8 @@ public class TaskDbHelper extends SQLiteOpenHelper {
                 TaskEntry.COLUMN_TASK_LABEL + " TEXT NOT NULL, " +
                 TaskEntry.COLUMN_TASK_DESCRIPTION + " TEXT, " +
                 TaskEntry.COLUMN_NOTIFICATION_TIME + " INTEGER NOT NULL, "+
-                TaskEntry.COLUMN_USER_ID + " TEXT NOT NULL);";
+                TaskEntry.COLUMN_USER_ID + " TEXT NOT NULL, " +
+                TaskEntry.COLUMN_TASK_STATUS + " INTEGER NOT NULL);";
 
         db.execSQL(SQL_CREATE_PETS_TABLE);
 

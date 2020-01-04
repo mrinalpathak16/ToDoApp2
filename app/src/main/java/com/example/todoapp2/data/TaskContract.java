@@ -30,9 +30,14 @@ public class TaskContract {
         public static final String COLUMN_TASK_DESCRIPTION = "description";
         public static final String COLUMN_NOTIFICATION_TIME = "time";
         public static final String COLUMN_USER_ID = "user";
+        public static final String COLUMN_TASK_STATUS = "status";
 
         public static final int NORMAL_TASK = 0;
         public static final int PRIORITY_TASK = 1;
+
+        public static final int SCHEDULED_TASK = 0;
+        public static final int ONGOING_TASK = 1;
+        public static final int COMPLETED_TASK = 2;
 
         public static boolean isValidType(int type){
             if(type==NORMAL_TASK||type==PRIORITY_TASK){

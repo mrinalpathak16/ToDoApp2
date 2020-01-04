@@ -16,8 +16,10 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         if(position==0)
             return new OngoingFragment();
-        else
+        else if(position ==1)
             return new ScheduledFragment();
+        else
+            return new CompletedFragment();
     }
 
     @Override
