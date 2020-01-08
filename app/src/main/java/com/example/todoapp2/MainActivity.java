@@ -40,8 +40,6 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
 
-    //TODO: Time display karne ki vyavastha karo.
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

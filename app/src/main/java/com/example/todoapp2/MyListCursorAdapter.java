@@ -55,7 +55,14 @@ public class MyListCursorAdapter extends CursorRecyclerViewAdapter<MyListCursorA
         }
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(menuGroupId, R.id.editMenu, Menu.NONE, "Edit Task");
+            String editTitle;
+            if(menuGroupId==103||menuGroupId==101){
+                editTitle = "Reset Task";
+            }
+            else{
+                editTitle = "Edit Task";
+            }
+            menu.add(menuGroupId, R.id.editMenu, Menu.NONE, editTitle);
             menu.add(menuGroupId, R.id.deleteMenu, Menu.NONE, "Delete Task");
             menu.setHeaderTitle("Select The Action");
         }

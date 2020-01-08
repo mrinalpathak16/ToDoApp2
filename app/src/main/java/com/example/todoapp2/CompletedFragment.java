@@ -88,7 +88,8 @@ public class CompletedFragment extends Fragment implements LoaderManager.LoaderC
                 TaskEntry.COLUMN_TASK_TYPE,
                 TaskEntry.COLUMN_TASK_LABEL,
                 TaskEntry.COLUMN_TASK_DESCRIPTION,
-                TaskEntry.COLUMN_NOTIFICATION_TIME
+                TaskEntry.COLUMN_NOTIFICATION_TIME,
+                TaskEntry.COLUMN_TASK_STATUS
         };
 
         String selection = TaskEntry.COLUMN_USER_ID + "=\'" + mCurrentUser.getUid() +

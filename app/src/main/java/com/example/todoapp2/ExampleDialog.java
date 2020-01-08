@@ -36,6 +36,7 @@ import androidx.core.app.NotificationManagerCompat;
 import com.example.todoapp2.data.TaskContract.TaskEntry;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 
 public class ExampleDialog extends AppCompatDialogFragment {
@@ -71,10 +72,13 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
         String title;
         if(mUri==null){
-            title="Add Task";
+            title="Schedule New Task";
         }
         else{
-            title="Edit Task";
+            if(mCursor.getInt(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_STATUS))==0)
+                title="Edit Task";
+            else
+                title = "Reset Task";
         }
 
         builder.setView(view)
@@ -190,12 +194,29 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 time.getHour(), time.getMinute(), 0);
         long time = c.getTimeInMillis();
 
+        int no = 1;
+
+        if(type==1) {
+            if(time-TimeUnit.HOURS.toMillis(4)>=System.currentTimeMillis()){
+                time = time - TimeUnit.HOURS.toMillis(4);
+                no = 3;
+            }
+            else if(time-TimeUnit.MINUTES.toMillis(30)>=System.currentTimeMillis() &&
+                    time-TimeUnit.HOURS.toMillis(4)<=System.currentTimeMillis()) {
+                time = time - TimeUnit.MINUTES.toMillis(30);
+                no = 2;
+            }
+            else {
+
+            }
+        }
+
         if(mUri == null){
             savedUri = mContext.getContentResolver().insert(TaskEntry.CONTENT_URI, values);
             if(savedUri!=null){
                 message = "Pet inserted";
                 int Id = Integer.parseInt(savedUri.getLastPathSegment());
-                setAlarm(time, Id, type);
+                setAlarm(time, Id, type, no, label.getText().toString(), mUsername, desc.getText().toString());
                 Log.i("ExampleDialog", "alarm set");
             }
             else{
@@ -209,7 +230,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 message = "Pet updated";
                 int Id = Integer.parseInt(mUri.getLastPathSegment());
                 cancelAlarm(Id, mContext);
-                setAlarm(time,Id, type);
+                setAlarm(time,Id, type, no, label.getText().toString(), mUsername, desc.getText().toString());
             }
             else{
                 message = "error with updating pet";
@@ -220,7 +241,8 @@ public class ExampleDialog extends AppCompatDialogFragment {
     }
 
 
-    public void setAlarm(long t, int Id, int type){
+    public void setAlarm(long t, int Id, int type, int no, String taskLabel, String username,
+                         String taskDescription){
 
         Intent intent = new Intent(mContext, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
@@ -235,11 +257,11 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, "channelId")
                 .setSmallIcon(R.drawable.notif_icon)
-                .setContentTitle(label.getText().toString())
-                .setContentText(mUsername + " has a pending task!")
+                .setContentTitle(taskLabel)
+                .setContentText(username + " has a pending task!")
                 .setLargeIcon(icon)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(desc.getText().toString()))
+                        .bigText(taskDescription))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
@@ -251,6 +273,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
         Log.i("ExampleDialog", "built!"+t);
 
         Intent notificationIntent = new Intent(mContext, MyNotificationPublisher.class);
+        notificationIntent.putExtra("number", no);
         notificationIntent.putExtra("notificationId", Id);
         notificationIntent.setData(Uri.withAppendedPath(TaskEntry.CONTENT_URI,String.valueOf(Id)));
         notificationIntent.putExtra("notification", notification);
@@ -260,8 +283,8 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 notificationIntent,
                 0);
 
-        AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP,t, pI);
+        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, t, pI);
 
     }
 

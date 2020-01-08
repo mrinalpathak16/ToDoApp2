@@ -29,9 +29,15 @@ public class DetailsDialog extends AppCompatDialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.details_dialog, null);
 
+        String title;
+        if(mCursor.getInt(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_STATUS))==0)
+            title="Edit";
+        else
+            title = "Reset";
+
         builder.setView(view)
                 .setTitle("Task Details")
-                .setNegativeButton("edit", new DialogInterface.OnClickListener() {
+                .setNegativeButton(title, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         OngoingFragment.EditDialogListener listener =
