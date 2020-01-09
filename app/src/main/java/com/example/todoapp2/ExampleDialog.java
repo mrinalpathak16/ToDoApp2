@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
@@ -92,7 +93,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        saveTask();
+
                     }
                 });
         normal = view.findViewById(R.id.normalTask);
@@ -159,7 +160,38 @@ public class ExampleDialog extends AppCompatDialogFragment {
                     Integer.parseInt(obj.getDayOfMonth()));
         }
 
-        return builder.create();
+        AlertDialog alertDialog =  builder.create();
+
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(final DialogInterface dialog) {
+                Button positiveButton = ((AlertDialog) dialog)
+                        .getButton(AlertDialog.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Calendar c = Calendar.getInstance();
+                        c.set(date.getYear(), date.getMonth(), date.getDayOfMonth(),
+                                time.getHour(), time.getMinute(), 0);
+                        long t = c.getTimeInMillis();
+                        if(!(label.getText().toString().equals(""))&&t>System.currentTimeMillis()){
+                            saveTask();
+                            dialog.dismiss();
+                        }
+                        else {
+                            if(label.getText().toString().equals(""))
+                                Toast.makeText(mContext, "Task Label Required!", Toast.LENGTH_SHORT).
+                                        show();
+                            else
+                                Toast.makeText(mContext, "Please insert a time in future!",
+                                        Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
+
+        return alertDialog;
     }
 
     public void saveTask(){
@@ -176,8 +208,6 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 date.getDayOfMonth()*10000 + time.getHour()*100 + time.getMinute();
 
         Log.i(LOG_TAG,""+notifTime);
-
-        //TODO: Galti se press ho gaya wala condition
 
         ContentValues values = new ContentValues();
         values.put(TaskEntry.COLUMN_TASK_TYPE, type);

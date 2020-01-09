@@ -4,12 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,6 +22,10 @@ import com.google.firebase.auth.FirebaseAuth;
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
+    private EditText emailText, passwordText;
+    private Button loginButton;
+    private TextView signupLink;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,20 +33,59 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        final EditText username = findViewById(R.id.usernameField);
-        final EditText password = findViewById(R.id.passwordField);
-        ((Button)findViewById(R.id.inButton)).setOnClickListener(new View.OnClickListener() {
+        emailText = findViewById(R.id.input_email);
+        passwordText = findViewById(R.id.input_password);
+        loginButton = findViewById(R.id.btn_login);
+        signupLink = findViewById(R.id.link_signup);
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signIn(username.getText().toString(), password.getText().toString());
+                login();
             }
         });
-        ((Button)findViewById(R.id.upButton)).setOnClickListener(new View.OnClickListener() {
+
+        signupLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signUp(username.getText().toString(), password.getText().toString());
+                Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+                startActivity(intent);
             }
         });
+
+    }
+
+    public void login(){
+        loginButton.setEnabled(false);
+
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
+                R.style.AppTheme_Dark_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Authenticating...");
+        progressDialog.show();
+
+        String username = emailText.getText().toString();
+        String password = passwordText.getText().toString();
+
+        mAuth.signInWithEmailAndPassword(username, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        progressDialog.dismiss();
+                        if (task.isSuccessful()) {
+                            startActivity(new Intent(LoginActivity.this,
+                                    MainActivity.class));
+                            Toast.makeText(LoginActivity.this, "Welcome",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.w("Sign In", "signInWithEmail:failure", task.getException());
+                            loginButton.setEnabled(true);
+                            Toast.makeText(LoginActivity.this, "Authentication failed. " +
+                                            task.getException().getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     public void signIn(String username, String password) {

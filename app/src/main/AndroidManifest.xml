@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.todoapp2">
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".App"
@@ -12,10 +12,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity" android:label="Login"
-            android:noHistory="true" android:excludeFromRecents="true">
-        </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".SignupActivity"
+            android:excludeFromRecents="true"
+            android:label="Sign Up"
+            android:noHistory="true"></activity>
+        <activity
+            android:name=".LoginActivity"
+            android:excludeFromRecents="true"
+            android:label="Login"
+            android:noHistory="true"></activity>
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,12 +31,9 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".MyNotificationPublisher"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
+        <receiver
+            android:name=".MyNotificationPublisher"
+            android:exported="true"></receiver>
 
         <provider
             android:name=".data.TaskProvider"

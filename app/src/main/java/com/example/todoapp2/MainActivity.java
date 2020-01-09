@@ -75,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
             startActivity(intent);
             finish();
         }
+        else {
+            setTitle(mCurrentUser.getDisplayName());
+        }
     }
 
     @Override
