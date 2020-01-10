@@ -136,7 +136,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
-                    android:text="__:__"/>
+                    android:textSize="20sp"
+                    android:padding="6dp"
+                    android:drawablePadding="6dp"
+                    android:text="__:__"
+                    android:drawableRight="@drawable/time_pick"/>
             </LinearLayout>
 
             <LinearLayout
@@ -155,7 +159,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
-                    android:text="__/__/____"/>
+                    android:textSize="20sp"
+                    android:padding="6dp"
+                    android:drawablePadding="6dp"
+                    android:text="__/__/____"
+                    android:drawableRight="@drawable/date_pick"/>
+
             </LinearLayout>
         </LinearLayout>
 

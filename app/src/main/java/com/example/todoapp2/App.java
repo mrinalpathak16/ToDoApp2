@@ -14,6 +14,7 @@ public class App extends Application {
         createChannel();
     }
 
+    //to create a notification channel
     public void createChannel(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             CharSequence name = "Channel1";

@@ -22,7 +22,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-
+//MainActivity which represents the Main Screen of the app
 public class MainActivity extends AppCompatActivity implements MyListCursorAdapter.RecyclerClickListener,
         OngoingFragment.EditDialogListener,
         ScheduledFragment.EditDialogListener,
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
 
         mAuth = FirebaseAuth.getInstance();
 
+        //Setting up tabs using Fragments, ViewPager and TabLayout
         ViewPager viewPager = findViewById(R.id.viewpager);
         SimpleFragmentPagerAdapter adapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        //FloatingActionButton to add new tasks.
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,11 +61,15 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
     protected void onStart() {
         super.onStart();
         mCurrentUser = mAuth.getCurrentUser();
+
+        //Receiving email sent by the Notification.
         final String userEmail = getIntent().getStringExtra("Email");
-        Log.d("Example Dialog", "Email : "+userEmail);
+
+        //Checking if the user is already logged in or not.
         if(mCurrentUser==null){
-            Log.d("ExampleDialog", "User not signed in");
             Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+
+            //To set Email Id to the edit text if a notification was clicked.
             if(userEmail!=null){
                 intent.putExtra("email", userEmail);
                 intent.putExtra("verify", "not null");
@@ -73,10 +79,13 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
         }
         else {
             String uid = getIntent().getStringExtra("Uid");
-            Log.d("ExampleDialog","uid : " +uid);
+
+            //if the correct user is already logged in
             if(uid==null||uid.equals(mCurrentUser.getUid())){
                 setTitle(mCurrentUser.getDisplayName());
             }
+
+            //To ask for logout if some other user was logged in
             else{
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                 alertDialogBuilder.setTitle("Another User Logged In!");
@@ -123,6 +132,8 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
         return super.onOptionsItemSelected(item);
     }
 
+
+    //to receive calls to open the dialog to edit or add a task
     @Override
     public void openDialog(Uri uri, Cursor cursor){
         ExampleDialog exampleDialog = new ExampleDialog();
@@ -131,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
         exampleDialog.show(getSupportFragmentManager(), "example dialog");
     }
 
+    //to receive calls to open the dialog to see the details tasks
     @Override
     public void openDetailsDialog(Cursor cursor, Uri uri) {
         DetailsDialog detailsDialog = new DetailsDialog();

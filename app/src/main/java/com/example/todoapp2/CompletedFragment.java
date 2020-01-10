@@ -40,10 +40,12 @@ public class CompletedFragment extends Fragment implements LoaderManager.LoaderC
 
         mRecyclerView = rootView.findViewById(R.id.rv);
 
+        //setting adapter for recycler view
         mAdapter = new MyListCursorAdapter(getContext(),null,103);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        //to open edit dialog
         listener = (EditDialogListener)getContext();
 
         getLoaderManager().initLoader(TASK_LOADER,null, this);
@@ -115,6 +117,7 @@ public class CompletedFragment extends Fragment implements LoaderManager.LoaderC
     }
 
 
+    //to request main activity to open edit dialog.
     public interface EditDialogListener{
         void openDialog(Uri uri, Cursor cursor);
     }

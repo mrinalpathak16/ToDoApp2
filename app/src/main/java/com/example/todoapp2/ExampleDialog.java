@@ -71,6 +71,8 @@ public class ExampleDialog extends AppCompatDialogFragment {
         View view = inflater.inflate(R.layout.layout_dialog, null);
 
         String title;
+
+        //check if new task is being added or a task is being modified
         if(mUri==null){
             title="Schedule New Task";
         }
@@ -129,6 +131,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
         this.dateTextView = view.findViewById(R.id.dateTextView);
         final Calendar c = Calendar.getInstance();
 
+        //set the calendar to next minute
         int nextMinute = c.get(Calendar.MINUTE)+1;
         c.set(Calendar.MINUTE, nextMinute);
         c.set(Calendar.SECOND, 0);
@@ -140,6 +143,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
         String tm = String.valueOf(1*10000+c.get(Calendar.HOUR_OF_DAY)*100+nextMinute);
         timeTextView.setText(tm.substring(1,3)+":"+tm.substring(3));
 
+        //set the fields to their respective values if task is being edited
         if(mUri!=null){
             int taskT = mCursor.getInt(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_TYPE));
             if(taskT==0)
@@ -224,6 +228,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
         AlertDialog alertDialog =  builder.create();
 
+        //to perform sanity checks
         alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(final DialogInterface dialog) {
@@ -283,6 +288,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
         int no = 1;
 
+        //to check which(1st, 2nd or 3rd) notification this is in case of priority tasks.
         if(type==1) {
             if(time-TimeUnit.HOURS.toMillis(4)>=System.currentTimeMillis()){
                 time = time - TimeUnit.HOURS.toMillis(4);
@@ -328,6 +334,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
     }
 
 
+    //set the alarm
     public void setAlarm(long t, int Id, int type, int no, String taskLabel, String username,
                          String taskDescription){
 
@@ -360,6 +367,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
     }
 
+    //to cancel the alarm
     public void cancelAlarm(int Id, Context context){
         Intent notificationIntent = new Intent(context, MyNotificationPublisher.class);
         notificationIntent.setData(Uri.withAppendedPath(TaskEntry.CONTENT_URI,String.valueOf(Id)));

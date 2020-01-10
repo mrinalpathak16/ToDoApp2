@@ -36,6 +36,8 @@ public class MyNotificationPublisher extends BroadcastReceiver {
         String email = intent.getStringExtra("userEmail");
         int no = intent.getIntExtra("number", 1);
         String usernameExtra;
+
+        //if this is the notification of a priority task
         if(no==3) {
              usernameExtra = "\'s priority task in 4 hours";
         }
@@ -47,6 +49,7 @@ public class MyNotificationPublisher extends BroadcastReceiver {
         }
 
 
+        //building notification
         Intent firstIntent = new Intent(context, MainActivity.class);
         firstIntent.putExtra("Uid", uid);
         firstIntent.putExtra("Email", email);
@@ -72,6 +75,7 @@ public class MyNotificationPublisher extends BroadcastReceiver {
         notificationManager.notify(notificationId, notification);
 
 
+        //to give successive alarms in case of priority tasks
         if(no == 3||no==2){
             long time;
             time = System.currentTimeMillis()+TimeUnit.MINUTES.toMillis(30);

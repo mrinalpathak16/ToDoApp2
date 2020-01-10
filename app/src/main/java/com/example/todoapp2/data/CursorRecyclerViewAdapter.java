@@ -6,6 +6,7 @@ import android.database.DataSetObserver;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+//Abstract adapter for Recycler View to take input from ContentProvider
 public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
     private Context mContext;
@@ -103,7 +104,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             mRowIdColumn = -1;
             mDataValid = false;
             notifyDataSetChanged();
-            //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
+
         }
         return oldCursor;
     }
@@ -121,7 +122,6 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             super.onInvalidated();
             mDataValid = false;
             notifyDataSetChanged();
-            //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
         }
     }
 }
