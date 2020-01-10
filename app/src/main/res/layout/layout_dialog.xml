@@ -126,17 +126,17 @@
                 android:layout_margin="12dp">
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="24sp"
                     android:text="Time : "
                     android:gravity="center_vertical"/>
-                <TimePicker
-                    android:id="@+id/time"
+                <TextView
+                    android:id="@+id/timeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
-                    android:timePickerMode="spinner"/>
+                    android:text="__:__"/>
             </LinearLayout>
 
             <LinearLayout
@@ -145,17 +145,17 @@
                 android:layout_margin="12dp">
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:textStyle="bold"
                     android:textSize="24sp"
                     android:text="Date : "/>
-                <DatePicker
-                    android:id="@+id/date"
+                <TextView
+                    android:id="@+id/dateTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
-                    android:datePickerMode="calendar" />
+                    android:text="__/__/____"/>
             </LinearLayout>
         </LinearLayout>
 

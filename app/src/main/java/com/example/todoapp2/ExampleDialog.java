@@ -2,9 +2,11 @@ package com.example.todoapp2;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,8 +47,6 @@ public class ExampleDialog extends AppCompatDialogFragment {
     private RadioButton normal, priority;
     private TextView normalText, priorityText;
     private CheckBox checkBox;
-    private TimePicker time;
-    private DatePicker date;
 
     public static final String LOG_TAG = ExampleDialog.class.getSimpleName();
 
@@ -55,6 +55,8 @@ public class ExampleDialog extends AppCompatDialogFragment {
     private Cursor mCursor;
     private String mUsername;
     private String mUid;
+    private TextView dateTextView;
+    private TextView timeTextView;
 
     public void setValues(Context context, Uri uri, Cursor cursor, String username, String uid){
         mContext =context;
@@ -126,10 +128,20 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 }
             }
         });
-        time = view.findViewById(R.id.time);
-        time.setIs24HourView(true);
-        date = view.findViewById(R.id.date);
-        date.setMinDate(System.currentTimeMillis());
+        timeTextView = view.findViewById(R.id.timeTextView);
+        this.dateTextView = view.findViewById(R.id.dateTextView);
+        final Calendar c = Calendar.getInstance();
+
+        int nextMinute = c.get(Calendar.MINUTE)+1;
+        c.set(Calendar.MINUTE, nextMinute);
+        c.set(Calendar.SECOND, 0);
+
+        String dt = String.valueOf(c.get(Calendar.YEAR)*10000+(c.get(Calendar.MONTH)+1)*100+
+                c.get(Calendar.DAY_OF_MONTH));
+        dateTextView.setText(dt.substring(6)+"/"+dt.substring(4,6)+"/"+ dt.substring(0,4));
+
+        String tm = String.valueOf(1*10000+c.get(Calendar.HOUR_OF_DAY)*100+nextMinute);
+        timeTextView.setText(tm.substring(1,3)+":"+tm.substring(3));
 
         if(mUri!=null){
             int taskT = mCursor.getInt(mCursor.getColumnIndexOrThrow(TaskEntry.COLUMN_TASK_TYPE));
@@ -153,12 +165,65 @@ public class ExampleDialog extends AppCompatDialogFragment {
                     TaskEntry.COLUMN_NOTIFICATION_TIME
             )));
 
-            time.setMinute(Integer.parseInt(obj.getMinute()));
-            time.setHour(Integer.parseInt(obj.getHour()));
+            dateTextView.setText(obj.getDayOfMonth()+"/"+obj.getMonth()+"/"+obj.getYear());
+            timeTextView.setText(obj.getHour()+":"+obj.getMinute());
 
-            date.updateDate(Integer.parseInt(obj.getYear()),(Integer.parseInt(obj.getMonth())-1),
-                    Integer.parseInt(obj.getDayOfMonth()));
+            c.set(Integer.parseInt(obj.getYear()),(Integer.parseInt(obj.getMonth())-1),
+                    Integer.parseInt(obj.getDayOfMonth()), Integer.parseInt(obj.getHour()),
+                    Integer.parseInt(obj.getMinute()), 0);
+            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(obj.getHour()));
         }
+
+        dateTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int yearAlready = c.get(Calendar.YEAR);
+                final int month = c.get(Calendar.MONTH);
+                int day = c.get(Calendar.DAY_OF_MONTH);
+
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(mContext,
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+
+                                String dt = String.valueOf(year*10000+(monthOfYear+1)*100+dayOfMonth);
+                                dateTextView.setText(dt.substring(6)+"/"+dt.substring(4,6)+"/"+
+                                        dt.substring(0,4));
+                                c.set(year, monthOfYear, dayOfMonth);
+
+                            }
+                        }, yearAlready, month, day);
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+                datePickerDialog.show();
+            }
+        });
+
+        timeTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int hour = c.get(Calendar.HOUR_OF_DAY);
+                int minuteAlready = c.get(Calendar.MINUTE);
+                TimePickerDialog timePickerDialog = new TimePickerDialog(mContext,
+                        new TimePickerDialog.OnTimeSetListener() {
+
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay,
+                                                  int minute) {
+
+                                String tm = String.valueOf(1*10000+hourOfDay*100+minute);
+                                timeTextView.setText(tm.substring(1,3)+":"+tm.substring(3));
+                                c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                c.set(Calendar.MINUTE, minute);
+                                c.set(Calendar.SECOND,0);
+                            }
+                        }, hour, minuteAlready, false);
+                timePickerDialog.show();
+            }
+        });
 
         AlertDialog alertDialog =  builder.create();
 
@@ -170,12 +235,9 @@ public class ExampleDialog extends AppCompatDialogFragment {
                 positiveButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Calendar c = Calendar.getInstance();
-                        c.set(date.getYear(), date.getMonth(), date.getDayOfMonth(),
-                                time.getHour(), time.getMinute(), 0);
                         long t = c.getTimeInMillis();
                         if(!(label.getText().toString().equals(""))&&t>System.currentTimeMillis()){
-                            saveTask();
+                            saveTask(c);
                             dialog.dismiss();
                         }
                         else {
@@ -194,7 +256,7 @@ public class ExampleDialog extends AppCompatDialogFragment {
         return alertDialog;
     }
 
-    public void saveTask(){
+    public void saveTask(Calendar c){
         int type;
         if(normal.isChecked()){
             type = 0;
@@ -204,8 +266,9 @@ public class ExampleDialog extends AppCompatDialogFragment {
         }
         String taskLabel = label.getText().toString();
         String taskDesc = desc.getText().toString();
-        long notifTime = ((long)date.getYear())*100000000 + (date.getMonth()+1)*1000000 +
-                date.getDayOfMonth()*10000 + time.getHour()*100 + time.getMinute();
+        long notifTime = ((long)c.get(Calendar.YEAR))*100000000 + (c.get(Calendar.MONTH)+1)*1000000 +
+                c.get(Calendar.DAY_OF_MONTH)*10000 + c.get(Calendar.HOUR_OF_DAY)*100 +
+                c.get(Calendar.MINUTE);
 
         Log.i(LOG_TAG,""+notifTime);
 
@@ -219,9 +282,6 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
         Uri savedUri;String message;
 
-        Calendar c = Calendar.getInstance();
-        c.set(date.getYear(), date.getMonth(), date.getDayOfMonth(),
-                time.getHour(), time.getMinute(), 0);
         long time = c.getTimeInMillis();
 
         int no = 1;
@@ -320,12 +380,13 @@ public class ExampleDialog extends AppCompatDialogFragment {
 
     public void cancelAlarm(int Id, Context context){
         Intent notificationIntent = new Intent(context, MyNotificationPublisher.class);
+        notificationIntent.setData(Uri.withAppendedPath(TaskEntry.CONTENT_URI,String.valueOf(Id)));
         PendingIntent pI = PendingIntent.getBroadcast(
                 context,
                 Id,
                 notificationIntent,
                 0);
-
+        Log.i("ExampleDialog", "cancelled"+Id);
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pI);
     }
