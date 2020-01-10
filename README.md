@@ -2,7 +2,7 @@
 
 ToDoApp is a Task List storing app which shows notifications for each task at the suggested time.
 The app supports saving two types of tasks, Normal Tasks and Priority Tasks.
-Normal tasls only show a single notification at the time of the notification,
+Normal tasks only show a single notification at the time of the notification,
 whereas Priority Tasks show three notification in total, one 4 hours before, one 30 minutes before and one at the time of the notification.
 
 This app has been developed by Mrinal Pathak, an undergraduate pursuing Bachelor of Technology in Engineering Physics at
