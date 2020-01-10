@@ -102,7 +102,8 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
     @Override
     public void openDialog(Uri uri, Cursor cursor){
         ExampleDialog exampleDialog = new ExampleDialog();
-        exampleDialog.setValues(this, uri, cursor, mCurrentUser.getEmail(), mCurrentUser.getUid());
+        exampleDialog.setValues(this, uri, cursor, mCurrentUser.getDisplayName(),
+                mCurrentUser.getUid());
         exampleDialog.show(getSupportFragmentManager(), "example dialog");
     }
 

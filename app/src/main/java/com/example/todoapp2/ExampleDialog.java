@@ -334,9 +334,6 @@ public class ExampleDialog extends AppCompatDialogFragment {
     public void setAlarm(long t, int Id, int type, int no, String taskLabel, String username,
                          String taskDescription){
 
-        Intent intent = new Intent(mContext, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
-
         Bitmap icon;
         if (type==0){
             icon = BitmapFactory.decodeResource(getResources(), R.drawable.normal);
@@ -345,28 +342,14 @@ public class ExampleDialog extends AppCompatDialogFragment {
             icon = BitmapFactory.decodeResource(getResources(), R.drawable.priority);
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext, "channelId")
-                .setSmallIcon(R.drawable.notif_icon)
-                .setContentTitle(taskLabel)
-                .setContentText(username + " has a pending task!")
-                .setLargeIcon(icon)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(taskDescription))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(pendingIntent)
-                .setCategory(NotificationCompat.CATEGORY_REMINDER)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setAutoCancel(true);
-
-        Notification notification = builder.build();
-
-        Log.i("ExampleDialog", "built!"+t);
-
         Intent notificationIntent = new Intent(mContext, MyNotificationPublisher.class);
         notificationIntent.putExtra("number", no);
         notificationIntent.putExtra("notificationId", Id);
+        notificationIntent.putExtra("bitmap", icon);
+        notificationIntent.putExtra("tasklabel", taskLabel);
+        notificationIntent.putExtra("username", username);
+        notificationIntent.putExtra("taskdesc", taskDescription);
         notificationIntent.setData(Uri.withAppendedPath(TaskEntry.CONTENT_URI,String.valueOf(Id)));
-        notificationIntent.putExtra("notification", notification);
         PendingIntent pI = PendingIntent.getBroadcast(
                 mContext,
                 Id,

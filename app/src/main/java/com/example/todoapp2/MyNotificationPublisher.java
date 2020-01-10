@@ -7,15 +7,19 @@ import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 
+import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.example.todoapp2.data.TaskContract;
 
 import java.util.concurrent.TimeUnit;
+
+import com.example.todoapp2.data.TaskContract.TaskEntry;
 
 public class MyNotificationPublisher extends BroadcastReceiver {
     @Override
@@ -23,12 +27,47 @@ public class MyNotificationPublisher extends BroadcastReceiver {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
         Log.i("ExampleDialog", "notification shown");
-
-        Notification notification = intent.getParcelableExtra("notification");
         int notificationId = intent.getIntExtra("notificationId", 0);
+        String taskLabel = intent.getStringExtra("tasklabel");
+        String username = intent.getStringExtra("username");
+        String taskDescription = intent.getStringExtra("taskdesc");
+        Bitmap icon = intent.getParcelableExtra("bitmap");
+        int no = intent.getIntExtra("number", 1);
+        String usernameExtra;
+        if(no==3) {
+             usernameExtra = "\'s priority task in 4 hours";
+        }
+        else if(no==2){
+            usernameExtra = "\'s priority task in 30 minutes";
+        }
+        else{
+            usernameExtra = " has a task to do";
+        }
+
+
+        Intent firstIntent = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, firstIntent,
+                0);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelId")
+                .setSmallIcon(R.drawable.notif_icon)
+                .setContentTitle(taskLabel)
+                .setContentText(username + usernameExtra)
+                .setLargeIcon(icon)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(taskDescription))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setAutoCancel(true);
+
+        Notification notification = builder.build();
+
+        Log.i("ExampleDialog", "built!");
+
         notificationManager.notify(notificationId, notification);
 
-        int no = intent.getIntExtra("number", 1);
+
         if(no == 3||no==2){
             long time;
             time = System.currentTimeMillis()+TimeUnit.MINUTES.toMillis(30);
@@ -41,14 +80,18 @@ public class MyNotificationPublisher extends BroadcastReceiver {
             Intent notificationIntent = new Intent(context, MyNotificationPublisher.class);
             notificationIntent.putExtra("number", no);
             notificationIntent.putExtra("notificationId", notificationId);
-            notificationIntent.setData(Uri.withAppendedPath(TaskContract.TaskEntry.CONTENT_URI,
-                    String.valueOf(notificationId)));
-            notificationIntent.putExtra("notification", notification);
+            notificationIntent.putExtra("bitmap", icon);
+            notificationIntent.putExtra("tasklabel", taskLabel);
+            notificationIntent.putExtra("username", username);
+            notificationIntent.putExtra("taskdesc", taskDescription);
+            notificationIntent.setData(Uri.withAppendedPath(TaskEntry.CONTENT_URI,String.valueOf(
+                    notificationId
+            )));
             PendingIntent pI = PendingIntent.getBroadcast(
                     context,
                     notificationId,
                     notificationIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    0);
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.cancel(pI);
