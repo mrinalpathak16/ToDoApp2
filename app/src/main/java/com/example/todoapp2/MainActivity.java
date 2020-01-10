@@ -1,19 +1,11 @@
 package com.example.todoapp2;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
 import androidx.viewpager.widget.ViewPager;
 
-import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -27,11 +19,9 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
-import com.example.todoapp2.data.TaskContract.TaskEntry;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MyListCursorAdapter.RecyclerClickListener,
         OngoingFragment.EditDialogListener,
@@ -69,14 +59,48 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
     protected void onStart() {
         super.onStart();
         mCurrentUser = mAuth.getCurrentUser();
+        final String userEmail = getIntent().getStringExtra("Email");
+        Log.d("Example Dialog", "Email : "+userEmail);
         if(mCurrentUser==null){
-            Log.i("Login", "User not signed in");
+            Log.d("ExampleDialog", "User not signed in");
             Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            if(userEmail!=null){
+                intent.putExtra("email", userEmail);
+                intent.putExtra("verify", "not null");
+            }
             startActivity(intent);
             finish();
         }
         else {
-            setTitle(mCurrentUser.getDisplayName());
+            String uid = getIntent().getStringExtra("Uid");
+            Log.d("ExampleDialog","uid : " +uid);
+            if(uid==null||uid.equals(mCurrentUser.getUid())){
+                setTitle(mCurrentUser.getDisplayName());
+            }
+            else{
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                alertDialogBuilder.setTitle("Another User Logged In!");
+                alertDialogBuilder.setMessage("Logout User : " +'\n'+"Name : "+
+                        mCurrentUser.getDisplayName()+'\n'+"Email : "+mCurrentUser.getEmail()+" ?");
+                alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                        intent.putExtra("email", userEmail);
+                        mAuth.signOut();
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }
         }
     }
 
@@ -103,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
     public void openDialog(Uri uri, Cursor cursor){
         ExampleDialog exampleDialog = new ExampleDialog();
         exampleDialog.setValues(this, uri, cursor, mCurrentUser.getDisplayName(),
-                mCurrentUser.getUid());
+                mCurrentUser.getUid(), mCurrentUser.getEmail());
         exampleDialog.show(getSupportFragmentManager(), "example dialog");
     }
 

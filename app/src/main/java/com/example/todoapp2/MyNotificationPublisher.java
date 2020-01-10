@@ -32,6 +32,8 @@ public class MyNotificationPublisher extends BroadcastReceiver {
         String username = intent.getStringExtra("username");
         String taskDescription = intent.getStringExtra("taskdesc");
         Bitmap icon = intent.getParcelableExtra("bitmap");
+        String uid = intent.getStringExtra("uid");
+        String email = intent.getStringExtra("userEmail");
         int no = intent.getIntExtra("number", 1);
         String usernameExtra;
         if(no==3) {
@@ -46,8 +48,10 @@ public class MyNotificationPublisher extends BroadcastReceiver {
 
 
         Intent firstIntent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, firstIntent,
-                0);
+        firstIntent.putExtra("Uid", uid);
+        firstIntent.putExtra("Email", email);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationId, firstIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelId")
                 .setSmallIcon(R.drawable.notif_icon)
                 .setContentTitle(taskLabel)
@@ -91,7 +95,7 @@ public class MyNotificationPublisher extends BroadcastReceiver {
                     context,
                     notificationId,
                     notificationIntent,
-                    0);
+                    PendingIntent.FLAG_UPDATE_CURRENT);
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.cancel(pI);

@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
@@ -14,8 +13,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,9 +29,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatDialogFragment;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import com.example.todoapp2.data.TaskContract.TaskEntry;
 
@@ -55,15 +49,18 @@ public class ExampleDialog extends AppCompatDialogFragment {
     private Cursor mCursor;
     private String mUsername;
     private String mUid;
+    private String mEmail;
     private TextView dateTextView;
     private TextView timeTextView;
 
-    public void setValues(Context context, Uri uri, Cursor cursor, String username, String uid){
+    public void setValues(Context context, Uri uri, Cursor cursor, String username, String uid,
+                          String email){
         mContext =context;
         mUri = uri;
         mCursor = cursor;
         mUsername = username;
         mUid = uid;
+        mEmail = email;
     }
 
     @Override
@@ -349,12 +346,14 @@ public class ExampleDialog extends AppCompatDialogFragment {
         notificationIntent.putExtra("tasklabel", taskLabel);
         notificationIntent.putExtra("username", username);
         notificationIntent.putExtra("taskdesc", taskDescription);
+        notificationIntent.putExtra("uid", mUid);
+        notificationIntent.putExtra("userEmail", mEmail);
         notificationIntent.setData(Uri.withAppendedPath(TaskEntry.CONTENT_URI,String.valueOf(Id)));
         PendingIntent pI = PendingIntent.getBroadcast(
                 mContext,
                 Id,
                 notificationIntent,
-                0);
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, t, pI);

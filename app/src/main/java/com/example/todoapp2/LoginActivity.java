@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,6 +39,30 @@ public class LoginActivity extends AppCompatActivity {
         passwordText = findViewById(R.id.input_password);
         loginButton = findViewById(R.id.btn_login);
         signupLink = findViewById(R.id.link_signup);
+
+        final String userLoginEmail = getIntent().getStringExtra("email");
+        if(userLoginEmail!=null){
+            if(getIntent().getStringExtra("verify")!=null) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+                alertDialogBuilder.setTitle("User Logged Out!");
+                alertDialogBuilder.setMessage("User has been logged out! \n Please login to continue.");
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }
+            emailText.setText(userLoginEmail);
+        }
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
