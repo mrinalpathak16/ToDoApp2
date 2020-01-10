@@ -67,62 +67,32 @@ public class LoginActivity extends AppCompatActivity {
         String username = emailText.getText().toString();
         String password = passwordText.getText().toString();
 
-        mAuth.signInWithEmailAndPassword(username, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressDialog.dismiss();
-                        if (task.isSuccessful()) {
-                            startActivity(new Intent(LoginActivity.this,
-                                    MainActivity.class));
-                            Toast.makeText(LoginActivity.this, "Welcome",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Log.w("Sign In", "signInWithEmail:failure", task.getException());
-                            loginButton.setEnabled(true);
-                            Toast.makeText(LoginActivity.this, "Authentication failed. " +
-                                            task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
+        if (!(username.equals(""))&&!(password.equals(""))) {
+            mAuth.signInWithEmailAndPassword(username, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressDialog.dismiss();
+                            if (task.isSuccessful()) {
+                                startActivity(new Intent(LoginActivity.this,
+                                        MainActivity.class));
+                                Toast.makeText(LoginActivity.this, "Welcome",
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.w("Sign In", "signInWithEmail:failure", task.getException());
+                                loginButton.setEnabled(true);
+                                Toast.makeText(LoginActivity.this, "Authentication failed. " +
+                                                task.getException().getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                });
-    }
-
-    public void signIn(String username, String password) {
-        mAuth.signInWithEmailAndPassword(username, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            startActivity(new Intent(LoginActivity.this,
-                                    MainActivity.class));
-                            Toast.makeText(LoginActivity.this, "Welcome",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Log.w("Sign In", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed. " +
-                                            task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    public void signUp(String username, String password){
-        mAuth.createUserWithEmailAndPassword(username, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            Toast.makeText(LoginActivity.this, "User successfully registered",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            Toast.makeText(LoginActivity.this, "Registration failed. " +
-                                            task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                    });
+        }
+        else {
+            progressDialog.dismiss();
+            loginButton.setEnabled(true);
+            Toast.makeText(LoginActivity.this, "Field(s) cannot be empty!", Toast.LENGTH_SHORT)
+                    .show();
+        }
     }
 }

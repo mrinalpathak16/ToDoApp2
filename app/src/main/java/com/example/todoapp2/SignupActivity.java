@@ -74,39 +74,48 @@ public class SignupActivity extends AppCompatActivity {
         String username = emailText.getText().toString();
         String password = passwordText.getText().toString();
 
-        mAuth.createUserWithEmailAndPassword(username, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressDialog.dismiss();
-                        if(task.isSuccessful()){
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(!(name.equals(""))&&!(username.equals(""))&&!(password.equals(""))) {
+            mAuth.createUserWithEmailAndPassword(username, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressDialog.dismiss();
+                            if (task.isSuccessful()) {
+                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(name).build();
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(name).build();
 
-                            user.updateProfile(profileUpdates)
-                                    .addOnCompleteListener(
-                                            new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        Log.d("ExampleDialog",
-                                                                "User profile updated.");
+                                user.updateProfile(profileUpdates)
+                                        .addOnCompleteListener(
+                                                new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Log.d("ExampleDialog",
+                                                                    "User profile updated.");
+                                                        }
                                                     }
-                                                }
-                                            });
-                            Toast.makeText(SignupActivity.this, "User successfully registered",
-                                    Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(SignupActivity.this, MainActivity.class);
-                            finish();
+                                                });
+                                Toast.makeText(SignupActivity.this, "User successfully registered",
+                                        Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                signupButton.setEnabled(true);
+                                Toast.makeText(SignupActivity.this, "Registration failed. " +
+                                                task.getException().getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
                         }
-                        else {
-                            Toast.makeText(SignupActivity.this, "Registration failed. " +
-                                            task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                    });
+        }
+        else {
+            progressDialog.dismiss();
+            signupButton.setEnabled(true);
+            Toast.makeText(SignupActivity.this,"Field(s) cannot be empty!", Toast.LENGTH_SHORT)
+                    .show();
+        }
     }
 }
