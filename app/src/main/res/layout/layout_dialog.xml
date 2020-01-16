@@ -20,19 +20,20 @@
                 android:id="@+id/normalTask"
                 android:checked="true"/>
             <TextView
+                android:layout_weight="1"
                 android:id="@+id/normalTaskText"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:textSize="18sp"
-                android:text="Normal Task"
-                android:layout_marginEnd="30dp"/>
+                android:text="Normal Task" />
             <RadioButton
                 android:id="@+id/priorityTask"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"/>
             <TextView
+                android:layout_weight="1"
                 android:id="@+id/priorityTaskText"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

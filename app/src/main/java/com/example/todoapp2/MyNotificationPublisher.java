@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
@@ -31,11 +32,19 @@ public class MyNotificationPublisher extends BroadcastReceiver {
         String taskLabel = intent.getStringExtra("tasklabel");
         String username = intent.getStringExtra("username");
         String taskDescription = intent.getStringExtra("taskdesc");
-        Bitmap icon = intent.getParcelableExtra("bitmap");
+        int type = intent.getIntExtra("type", 0);
         String uid = intent.getStringExtra("uid");
         String email = intent.getStringExtra("userEmail");
         int no = intent.getIntExtra("number", 1);
         String usernameExtra;
+
+        Bitmap icon;
+        if (type==0){
+            icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.normal);
+        }
+        else {
+            icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.priority);
+        }
 
         //if this is the notification of a priority task
         if(no==3) {
@@ -55,13 +64,14 @@ public class MyNotificationPublisher extends BroadcastReceiver {
         firstIntent.putExtra("Email", email);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationId, firstIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
+        String mesFormat = context.getResources().getString(R.string.notif);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channelId")
                 .setSmallIcon(R.drawable.notif_icon)
                 .setContentTitle(taskLabel)
                 .setContentText(username + usernameExtra)
                 .setLargeIcon(icon)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(taskDescription))
+                        .bigText(String.format(mesFormat,username, taskDescription)))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)

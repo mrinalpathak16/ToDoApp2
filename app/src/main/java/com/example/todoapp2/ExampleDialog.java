@@ -11,8 +11,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -338,18 +336,10 @@ public class ExampleDialog extends AppCompatDialogFragment {
     public void setAlarm(long t, int Id, int type, int no, String taskLabel, String username,
                          String taskDescription){
 
-        Bitmap icon;
-        if (type==0){
-            icon = BitmapFactory.decodeResource(getResources(), R.drawable.normal);
-        }
-        else {
-            icon = BitmapFactory.decodeResource(getResources(), R.drawable.priority);
-        }
-
         Intent notificationIntent = new Intent(mContext, MyNotificationPublisher.class);
         notificationIntent.putExtra("number", no);
         notificationIntent.putExtra("notificationId", Id);
-        notificationIntent.putExtra("bitmap", icon);
+        notificationIntent.putExtra("type", type);
         notificationIntent.putExtra("tasklabel", taskLabel);
         notificationIntent.putExtra("username", username);
         notificationIntent.putExtra("taskdesc", taskDescription);

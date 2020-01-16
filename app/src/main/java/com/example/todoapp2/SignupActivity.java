@@ -99,6 +99,7 @@ public class SignupActivity extends AppCompatActivity {
                                                 });
                                 Toast.makeText(SignupActivity.this, "User successfully registered",
                                         Toast.LENGTH_SHORT).show();
+                                mAuth.signOut();
                                 Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
