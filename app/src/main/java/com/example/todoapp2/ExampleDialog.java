@@ -305,26 +305,26 @@ public class ExampleDialog extends AppCompatDialogFragment {
         if(mUri == null){
             savedUri = mContext.getContentResolver().insert(TaskEntry.CONTENT_URI, values);
             if(savedUri!=null){
-                message = "Pet inserted";
+                message = "Task inserted";
                 int Id = Integer.parseInt(savedUri.getLastPathSegment());
                 setAlarm(time, Id, type, no, label.getText().toString(), mUsername, desc.getText().toString());
                 Log.i("ExampleDialog", "alarm set");
             }
             else{
-                message = "error with saving pet";
+                message = "error with saving Task";
             }
 
         }
         else{
             int i = mContext.getContentResolver().update(mUri, values, null, null);
             if(i!=-1){
-                message = "Pet updated";
+                message = "Task updated";
                 int Id = Integer.parseInt(mUri.getLastPathSegment());
                 cancelAlarm(Id, mContext);
                 setAlarm(time,Id, type, no, label.getText().toString(), mUsername, desc.getText().toString());
             }
             else{
-                message = "error with updating pet";
+                message = "error with updating Task";
             }
         }
         Toast.makeText(mContext, message,Toast.LENGTH_SHORT).show();
