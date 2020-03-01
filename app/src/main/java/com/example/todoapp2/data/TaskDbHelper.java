@@ -12,7 +12,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "todo.db";
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public TaskDbHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,11 +32,26 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
         db.execSQL(SQL_CREATE_PETS_TABLE);
 
+        String SQL_CREATE_NAMES_TABLE = "CREATE TABLE " + TaskEntry.TABLE_1 + " (" +
+                TaskEntry._ID1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                TaskEntry.COLUMN_UID + " TEXT NOT NULL, " +
+                TaskEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                TaskEntry.COLUMN_EMAIL + " TEXT NOT NULL);";
+
+        db.execSQL(SQL_CREATE_NAMES_TABLE);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 
-    }
+        String SQL_CREATE_NAMES_TABLE = "CREATE TABLE " + TaskEntry.TABLE_1 + " (" +
+                TaskEntry._ID1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                TaskEntry.COLUMN_UID + " TEXT NOT NULL, " +
+                TaskEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                TaskEntry.COLUMN_EMAIL + " TEXT NOT NULL);";
 
+        sqLiteDatabase.execSQL(SQL_CREATE_NAMES_TABLE);
+
+    }
 }

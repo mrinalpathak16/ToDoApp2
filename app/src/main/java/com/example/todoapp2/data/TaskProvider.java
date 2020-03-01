@@ -18,6 +18,8 @@ public class TaskProvider extends ContentProvider {
 
     private static final int TASKS = 100;
     private static final int TASK_ID = 101;
+    private static final int NAMES = 102;
+    private static final int NAME_ID = 103;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -26,6 +28,10 @@ public class TaskProvider extends ContentProvider {
         sUriMatcher.addURI(TaskContract.CONTENT_AUTHORITY, TaskContract.PATH_TASKS, TASKS);
 
         sUriMatcher.addURI(TaskContract.CONTENT_AUTHORITY,TaskContract.PATH_TASKS+"/#",TASK_ID);
+
+        sUriMatcher.addURI(TaskContract.CONTENT_AUTHORITY, TaskContract.PATH_NAMES, NAMES);
+
+        sUriMatcher.addURI(TaskContract.CONTENT_AUTHORITY,TaskContract.PATH_NAMES+"/#",NAME_ID);
 
     }
 
@@ -58,6 +64,16 @@ public class TaskProvider extends ContentProvider {
                 cursor = database.query(TaskEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
+            case NAMES:
+                cursor = database.query(TaskEntry.TABLE_1, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case NAME_ID:
+                selection = TaskEntry._ID1 + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+
+                cursor = database.query(TaskEntry.TABLE_1, projection, selection, selectionArgs,
+                        null, null, sortOrder);
             default:
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }
@@ -73,10 +89,43 @@ public class TaskProvider extends ContentProvider {
         switch (match) {
             case TASKS:
                 return insertTask(uri, contentValues);
+            case NAMES:
+                return insertName(uri, contentValues);
             default:
                 throw new IllegalArgumentException("Insertion is not supported for " + uri);
         }
     }
+    private Uri insertName(Uri uri, ContentValues contentValues){
+        String uid = contentValues.getAsString(TaskEntry.COLUMN_UID);
+        if (uid==null) {
+            throw new IllegalArgumentException("UID required");
+        }
+
+        String name = contentValues.getAsString(TaskEntry.COLUMN_NAME);
+        if (name==null) {
+            throw new IllegalArgumentException("Name required");
+        }
+
+        String email = contentValues.getAsString(TaskEntry.COLUMN_EMAIL);
+        if (email==null) {
+            throw new IllegalArgumentException("email required");
+        }
+
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        long id = database.insert(TaskEntry.TABLE_1, null, contentValues);
+
+        if (id == -1) {
+            Log.e(LOG_TAG, "Failed to insert row for " + uri);
+            return null;
+        }
+
+        getContext().getContentResolver().notifyChange(uri,null);
+        // return the new URI with the ID appended to the end of it
+        return ContentUris.withAppendedId(uri, id);
+
+    }
+
     private Uri insertTask(Uri uri, ContentValues contentValues){
 
         Integer type = contentValues.getAsInteger(TaskEntry.COLUMN_TASK_TYPE);

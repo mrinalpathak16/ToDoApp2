@@ -5,9 +5,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.todoapp2.data.TaskContract.TaskEntry;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
@@ -61,6 +64,29 @@ public class MainActivity extends AppCompatActivity implements MyListCursorAdapt
     protected void onStart() {
         super.onStart();
         mCurrentUser = mAuth.getCurrentUser();
+
+        if(mCurrentUser!=null) {
+            String[] projection = {TaskEntry._ID1};
+            String selection = TaskEntry.COLUMN_UID + " = \'" + mCurrentUser.getUid() + "\'";
+
+            Cursor cursor = null;
+            try {
+                cursor = this.getContentResolver().query(TaskEntry.NAMES_URI, projection, selection,
+                        null, null);
+
+
+            } catch (SQLiteException e) {
+                Log.i("mrinal", "No Table");
+            }
+            if (cursor == null || cursor.getCount() <= 0) {
+                ContentValues values = new ContentValues();
+                values.put(TaskEntry.COLUMN_UID, mCurrentUser.getUid());
+                values.put(TaskEntry.COLUMN_NAME, mCurrentUser.getDisplayName());
+                values.put(TaskEntry.COLUMN_EMAIL, mCurrentUser.getEmail());
+
+                Uri uri = this.getContentResolver().insert(TaskEntry.NAMES_URI, values);
+            }
+        }
 
         //Receiving email sent by the Notification.
         final String userEmail = getIntent().getStringExtra("Email");

@@ -58,14 +58,35 @@ public class AutoStartUp extends BroadcastReceiver {
             String taskLabel = cursor.getString(cursor.getColumnIndexOrThrow(
                     TaskEntry.COLUMN_TASK_LABEL
             ));
-            String username = "yoyobantairapper";
             String taskDescription = cursor.getString(cursor.getColumnIndexOrThrow(
                     TaskEntry.COLUMN_TASK_DESCRIPTION
             ));
             String uid = cursor.getString(cursor.getColumnIndexOrThrow(
                     TaskEntry.COLUMN_USER_ID
             ));
-            String email = "hihi@haha.hmmmm";
+
+            String[] nameProjection = {
+                    TaskEntry._ID1,
+                    TaskEntry.COLUMN_NAME,
+                    TaskEntry.COLUMN_EMAIL
+            };
+            String nameSelection = TaskEntry.COLUMN_UID + " = \'" + uid + "\'";
+
+            Cursor nameCursor = context.getContentResolver().query(
+                    TaskEntry.NAMES_URI,
+                    nameProjection,
+                    nameSelection,
+                    null,
+                    null
+            );
+            nameCursor.moveToFirst();
+            String username = nameCursor.getString(nameCursor.getColumnIndexOrThrow(
+                    TaskEntry.COLUMN_NAME
+            ));
+            String email = nameCursor.getString(nameCursor.getColumnIndexOrThrow(
+                    TaskEntry.COLUMN_EMAIL
+            ));
+            Log.i("mrinal", " "+username);
             int no = 1;
             if(type==1) {
                 if(time- TimeUnit.HOURS.toMillis(4)>=System.currentTimeMillis()){
